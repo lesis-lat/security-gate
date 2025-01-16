@@ -6,7 +6,7 @@
       <img src="https://img.shields.io/badge/license-MIT-blue.svg">
     </a>
      <a href="https://github.com/instriq/security-gate/releases">
-      <img src="https://img.shields.io/badge/version-0.1.0-blue.svg">
+      <img src="https://img.shields.io/badge/version-0.1.1-blue.svg">
     </a>
     <img src="https://github.com/instriq/security-gate/actions/workflows/linter.yml/badge.svg">
     <img src="https://github.com/instriq/security-gate/actions/workflows/zarn.yml/badge.svg">
@@ -79,7 +79,7 @@ jobs:
 $ git clone https://github.com/instriq/security-gate && cd security-gate
     
 # Install libs dependencies
-$ sudo cpanm --installdeps .
+$ cpanm --installdeps .
 
 # Basic usage
 $ perl security-gate.pl --help
