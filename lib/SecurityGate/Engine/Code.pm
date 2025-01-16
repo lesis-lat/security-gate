@@ -21,6 +21,7 @@ package SecurityGate::Engine::Code {
                     $open_alerts++;
 
                     my $severity = $alert->{rule}->{security_severity_level} // 'unknown';
+                    
                     $severity_counts{$severity}++ if exists $severity_counts{$severity};
                 }
             }

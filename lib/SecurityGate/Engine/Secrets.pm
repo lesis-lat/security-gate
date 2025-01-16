@@ -43,13 +43,14 @@ package SecurityGate::Engine::Secrets {
                     my $file_path  = $location->{details}->{path} // 'Unknown file';
                     my $start_line = $location->{details}->{start_line} // 'Unknown line';
 
-                    print "    File: $file_path, Start line: $start_line\n";
+                    print "File: $file_path, Start line: $start_line\n";
                 }
             }
 
             print "\n";
 
             my $threshold = $severity_limits->{high};
+            
             if ($open_alerts > $threshold) {
                 print "[+] More than $threshold secret scanning alerts found. Blocking pipeline.\n";
                 return 1;
