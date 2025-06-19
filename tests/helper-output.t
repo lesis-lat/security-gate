@@ -10,7 +10,7 @@ use SecurityGate::Utils::Helper;
 subtest 'Helper output' => sub {
     my $helper_output = SecurityGate::Utils::Helper->new();
 
-    like($helper_output, qr/Security\ Gate\ v0\.0\.3/x, 'Helper output contains version');
+    like($helper_output, qr/Security\ Gate\ v0\.1\.0/x, 'Helper output contains version');
     like($helper_output, qr/-t,\ --token/x, 'Helper output contains token option');
     like($helper_output, qr/-r,\ --repo/x, 'Helper output contains repo option');
     like($helper_output, qr/--dependency-alerts/x, 'Helper output contains dependency alerts option');
