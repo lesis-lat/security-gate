@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_OK => 200;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -38,7 +42,7 @@ subtest 'Open code scanning alerts exceeding limits' => sub {
     plan tests => 3;
 
     my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
-    $mock_response -> set_always('code', 200);
+    $mock_response -> set_always('code', $HTTP_OK);
     $mock_response->set_always('json', [
         { state => 'open', rule => { security_severity_level => 'high' } },
         { state => 'open', rule => { security_severity_level => 'high' } },
@@ -57,10 +61,10 @@ subtest 'Open code scanning alerts exceeding limits' => sub {
         $result = SecurityGate::Engine::Code -> new('test_token', 'test_repo', \%severity_limits);
     };
 
-    like($output, qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 3/x,
+    like($output, qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 3/xms,
          'Output contains correct total alerts');
 
-    like($output, qr/\[\+\] \s More \s than \s \d+ \s \w+ \s code \s scanning \s alerts \s found/x,
+    like($output, qr/\[\+\] \s More \s than \s \d+ \s \w+ \s code \s scanning \s alerts \s found/xms,
          'Output contains correct severity alert count');
 
     is($result, 1, 'Returns 1 when open alerts exceed limits');
