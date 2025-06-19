@@ -1,9 +1,12 @@
 package SecurityGate::Engine::Dependencies {
     use strict;
     use warnings;
+    use Readonly;
+    our $VERSION = '0.1.0';
     use Mojo::UserAgent;
     use Mojo::JSON;
     use Exporter 'import';
+    Readonly my $HTTP_OK => 200;
 
     our @EXPORT_OK = qw(@SEVERITIES);
     our @SEVERITIES = ("critical", "high", "medium", "low");
@@ -17,10 +20,10 @@ package SecurityGate::Engine::Dependencies {
         my $userAgent = Mojo::UserAgent->new();
         my $request = $userAgent->get($endpoint, {Authorization => "Bearer $token"})->result();
 
-        if ($request->code() == 200) {
+        if ($request->code() == $HTTP_OK) {
             my $data = $request->json();
 
-            foreach my $alert (@$data) {
+            foreach my $alert (@{$data}) {
                 if ($alert->{state} eq "open") {
                     my $severity = $alert->{security_vulnerability}->{severity};
                     $severity_counts{$severity}++;
