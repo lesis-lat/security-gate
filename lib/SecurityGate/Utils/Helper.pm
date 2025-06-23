@@ -1,11 +1,12 @@
 package SecurityGate::Utils::Helper {
     use strict;
     use warnings;
+    our $VERSION = '0.1.0';
 
     sub new {
         return <<"EOT";
 
-Security Gate v0.0.3
+Security Gate v0.1.0
 Core Commands
 ==============
 Command                        Description

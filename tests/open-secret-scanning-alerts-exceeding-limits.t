@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_OK => 200;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -56,12 +60,12 @@ no warnings 'once';
 subtest 'Open secret scanning alerts exceeding limits' => sub {
     plan tests => 5;
 
-    MockMojoUserAgent::setup_mock_response(200, [
+    MockMojoUserAgent::setup_mock_response($HTTP_OK, [
         { state => 'open', number => 1 },
         { state => 'open', number => 2 },
     ]);
 
-    MockMojoUserAgent::setup_locations_response(200, [
+    MockMojoUserAgent::setup_locations_response($HTTP_OK, [
         { path => 'file1.txt', start_line => 10 },
         { path => 'file2.txt', start_line => 20 },
     ]);

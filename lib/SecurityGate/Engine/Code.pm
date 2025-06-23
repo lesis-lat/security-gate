@@ -1,8 +1,11 @@
 package SecurityGate::Engine::Code {
     use strict;
     use warnings;
+    use Readonly;
+    our $VERSION = '0.1.0';
     use Mojo::UserAgent;
     use Mojo::JSON;
+    Readonly my $HTTP_OK => 200;
 
     sub new {
         my ($class, $token, $repository, $severity_limits) = @_;
@@ -11,17 +14,19 @@ package SecurityGate::Engine::Code {
         my $userAgent = Mojo::UserAgent->new();
         my $alerts_request = $userAgent->get($alerts_endpoint, {Authorization => "Bearer $token"})->result();
 
-        if ($alerts_request->code() == 200) {
+        if ($alerts_request->code() == $HTTP_OK) {
             my $alerts_data = $alerts_request->json();
             my $open_alerts = 0;
-            my %severity_counts = map {$_ => 0} keys %$severity_limits;
+            my %severity_counts = map {$_ => 0} keys %{$severity_limits};
 
-            foreach my $alert (@$alerts_data) {
+            foreach my $alert (@{$alerts_data}) {
                 if ($alert->{state} eq "open") {
                     $open_alerts++;
 
                     my $severity = $alert->{rule}->{security_severity_level} // 'unknown';
-                    $severity_counts{$severity}++ if exists $severity_counts{$severity};
+                    if (exists $severity_counts{$severity}) {
+                        $severity_counts{$severity}++;
+                    }
                 }
             }
 
@@ -46,7 +51,6 @@ package SecurityGate::Engine::Code {
                 return 1;
             }
         }
-
         else {
             print "Error: Unable to fetch code scanning alerts. HTTP status code: " . $alerts_request->code() . "\n";
             return 1;

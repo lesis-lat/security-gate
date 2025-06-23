@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_UNAUTHORIZED => 401;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -38,7 +42,7 @@ subtest 'API request error' => sub {
     plan tests => 2;
 
     my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
-    $mock_response -> set_always('code', 401);
+    $mock_response -> set_always('code', $HTTP_UNAUTHORIZED);
 
     my %severity_limits = (
         critical => 0,
@@ -48,9 +52,9 @@ subtest 'API request error' => sub {
     );
 
     my $result;
-    my $error_message = qr/Error: \s Unable \s to \s fetch \s code \s scanning \s alerts\./x;
-    my $status_code = qr/\s HTTP \s status \s code: \s 401/x;
-    my $full_error_pattern = qr/$error_message$status_code/x;
+    my $error_message = qr/Error: \s Unable \s to \s fetch \s code \s scanning \s alerts\./xms;
+    my $status_code = qr/\s HTTP \s status \s code: \s $HTTP_UNAUTHORIZED/xms;
+    my $full_error_pattern = qr/$error_message$status_code/xms;
 
     stdout_like(
         sub { $result = SecurityGate::Engine::Code -> new('test_token', 'test_repo', \%severity_limits) },
