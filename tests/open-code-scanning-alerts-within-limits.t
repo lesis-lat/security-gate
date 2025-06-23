@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_OK => 200;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -38,7 +42,7 @@ subtest 'Open code scanning alerts within limits' => sub {
     plan tests => 2;
 
     my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
-    $mock_response -> set_always('code', 200);
+    $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', [
         { state => 'open', rule => { severity => 'high' } },
         { state => 'open', rule => { severity => 'medium' } },
@@ -52,9 +56,9 @@ subtest 'Open code scanning alerts within limits' => sub {
     );
 
     my $result;
-    my $total_pattern = qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 2/x;
-    my $severity_pattern = qr/(?:\[-\] \s (?:low|medium|high|critical): \s \d+\s*)+/x;
-    my $full_pattern = qr/$total_pattern.*$severity_pattern/sx;
+    my $total_pattern = qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 2/xms;
+    my $severity_pattern = qr/(?:\[-\] \s (?:low|medium|high|critical): \s \d+\s*)+/xms;
+    my $full_pattern = qr/$total_pattern.*$severity_pattern/xms;
 
     stdout_like(
         sub { $result = SecurityGate::Engine::Code -> new('test_token', 'test_repo', \%severity_limits) },

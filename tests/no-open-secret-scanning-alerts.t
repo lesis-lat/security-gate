@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_OK => 200;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -56,7 +60,7 @@ no warnings 'once';
 subtest 'No open secret scanning alerts' => sub {
     plan tests => 2;
 
-    MockMojoUserAgent::setup_mock_response(200, [
+    MockMojoUserAgent::setup_mock_response($HTTP_OK, [
         { state => 'closed' },
         { state => 'closed' },
     ]);

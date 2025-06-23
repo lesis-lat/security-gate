@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_UNAUTHORIZED => 401;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -56,7 +60,7 @@ no warnings 'once';
 subtest 'API error handling' => sub {
     plan tests => 2;
 
-    MockMojoUserAgent::setup_mock_response(401, undef);
+    MockMojoUserAgent::setup_mock_response($HTTP_UNAUTHORIZED, undef);
 
     my %severity_limits = (
         critical => 0,
@@ -66,9 +70,9 @@ subtest 'API error handling' => sub {
     );
 
     my $result;
-    my $expected_error_output_part1 = qr/Error:\ Unable\ to\ fetch\ secret\ scanning\ alerts\./xsm;
-    my $expected_error_output_part2 = qr/\ HTTP\ status\ code:\ 401/xsm;
-    my $expected_error_output = qr/$expected_error_output_part1.*$expected_error_output_part2/xsm;
+    my $expected_error_output_part1 = qr/Error:\ Unable\ to\ fetch\ secret\ scanning\ alerts\./xms;
+    my $expected_error_output_part2 = qr/\ HTTP\ status\ code:\ $HTTP_UNAUTHORIZED/xms;
+    my $expected_error_output = qr/$expected_error_output_part1.*$expected_error_output_part2/xms;
 
     stdout_like(
         sub { $result = SecurityGate::Engine::Secrets -> new('invalid_token', 'test_repo', \%severity_limits) },

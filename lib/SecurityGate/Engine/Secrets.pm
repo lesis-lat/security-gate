@@ -1,29 +1,31 @@
 package SecurityGate::Engine::Secrets {
     use strict;
     use warnings;
+    use Readonly;
+    our $VERSION = '0.1.0';
     use Mojo::UserAgent;
     use Mojo::JSON;
+    Readonly my $HTTP_OK => 200;
 
     sub new {
         my ($class, $token, $repository, $severity_limits) = @_;
-
         my $endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts";
         my $userAgent = Mojo::UserAgent->new();
         my $request = $userAgent->get($endpoint, {Authorization => "Bearer $token"})->result();
 
-        if ($request->code() == 200) {
+        if ($request->code() == $HTTP_OK) {
             my $data = $request->json();
             my $open_alerts = 0;
             my @alert_details;
 
-            foreach my $alert (@$data) {
+            foreach my $alert (@{$data}) {
                 if ($alert->{state} eq "open") {
                     $open_alerts++;
 
                     my $locations_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts/" . $alert->{number} . "/locations";
                     my $locations_request = $userAgent->get($locations_endpoint, {Authorization => "Bearer $token"})->result();
 
-                    if ($locations_request->code() == 200) {
+                    if ($locations_request->code() == $HTTP_OK) {
                         my $locations = $locations_request->json();
 
                         push @alert_details, {
