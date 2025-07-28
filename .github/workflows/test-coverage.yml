@@ -1,0 +1,51 @@
+name: Test Coverage
+
+on:
+  workflow_call:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    container: davorg/perl-coveralls:latest
+    name: Test coverage
+
+    defaults:
+      run:
+        working-directory: ./tests
+
+    outputs:
+      coverage_percent: ${{ steps.coverage_percent.outputs.coverage }}
+      coverage_badge_url: ${{ steps.set_badge_url.outputs.badge_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install modules
+        run: cpanm -n --installdeps .
+        working-directory: ./
+
+      - name: Run tests with coverage
+        run: PERL5OPT=-MDevel::Cover prove *.t
+
+      - name: Generate coverage report
+        run: cover
+
+      - id: coverage_percent
+        name: Extract total coverage percentage
+        run: echo "coverage=$(cover | perl -ne 'print +(split)[-1] if /^Total\b/')" >> $GITHUB_OUTPUT
+        working-directory: ./tests
+
+      - id: set_badge_url
+        name: Determine badge color and URL
+        run: |
+          COVERAGE=${{ steps.coverage_percent.outputs.coverage }}
+          echo "Coverage: $COVERAGE"
+          if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+            COLOR="brightgreen"
+          elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+          BADGE_URL="https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}"
+          echo "badge_url=$BADGE_URL" >> $GITHUB_OUTPUT
