@@ -2,6 +2,13 @@ name: Test Coverage
 
 on:
   workflow_call:
+    outputs:
+      coverage_percent:
+        description: "Coverage percentage"
+        value: ${{ jobs.coverage.outputs.coverage_percent }}
+      coverage_badge_url:
+        description: "Coverage badge URL"
+        value: ${{ jobs.coverage.outputs.coverage_badge_url }}
 
 jobs:
   coverage:
@@ -24,6 +31,10 @@ jobs:
         run: cpanm -n --installdeps .
         working-directory: ./
 
+      - name: Install bc
+        run: apt-get update && apt-get install -y bc
+        working-directory: ./
+
       - name: Run tests with coverage
         run: PERL5OPT=-MDevel::Cover prove *.t
 
@@ -32,17 +43,24 @@ jobs:
 
       - id: coverage_percent
         name: Extract total coverage percentage
-        run: echo "coverage=$(cover | perl -ne 'print +(split)[-1] if /^Total\b/')" >> $GITHUB_OUTPUT
+        run: |
+          COVERAGE=$(cover | perl -ne 'print +(split)[-1] if /^Total\b/' | tr -d '%')
+          if [ -z "$COVERAGE" ]; then
+            echo "Error: Could not extract coverage percentage"
+            exit 1
+          fi
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
         working-directory: ./tests
 
       - id: set_badge_url
         name: Determine badge color and URL
+        shell: bash 
         run: |
           COVERAGE=${{ steps.coverage_percent.outputs.coverage }}
           echo "Coverage: $COVERAGE"
-          if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+          if [ $(echo "$COVERAGE >= 90" | bc -l) -eq 1 ]; then
             COLOR="brightgreen"
-          elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+          elif [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then
             COLOR="yellow"
           else
             COLOR="red"
