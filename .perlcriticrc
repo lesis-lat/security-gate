@@ -2,6 +2,7 @@ severity = 2
 
 [-TestingAndDebugging::RequireUseStrict]
 [-TestingAndDebugging::RequireUseWarnings]
+[-CodeLayout::RequireTidyCode]
 
 [TestingAndDebugging::ProhibitNoWarnings]
 allow = once

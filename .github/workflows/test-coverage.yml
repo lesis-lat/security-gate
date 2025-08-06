@@ -1,0 +1,69 @@
+name: Test Coverage
+
+on:
+  workflow_call:
+    outputs:
+      coverage_percent:
+        description: "Coverage percentage"
+        value: ${{ jobs.coverage.outputs.coverage_percent }}
+      coverage_badge_url:
+        description: "Coverage badge URL"
+        value: ${{ jobs.coverage.outputs.coverage_badge_url }}
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    container: davorg/perl-coveralls:latest
+    name: Test coverage
+
+    defaults:
+      run:
+        working-directory: ./tests
+
+    outputs:
+      coverage_percent: ${{ steps.coverage_percent.outputs.coverage }}
+      coverage_badge_url: ${{ steps.set_badge_url.outputs.badge_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install modules
+        run: cpanm -n --installdeps .
+        working-directory: ./
+
+      - name: Install bc
+        run: apt-get update && apt-get install -y bc
+        working-directory: ./
+
+      - name: Run tests with coverage
+        run: PERL5OPT=-MDevel::Cover prove *.t
+
+      - name: Generate coverage report
+        run: cover
+
+      - id: coverage_percent
+        name: Extract total coverage percentage
+        run: |
+          COVERAGE=$(cover | perl -ne 'print +(split)[-1] if /^Total\b/' | tr -d '%')
+          if [ -z "$COVERAGE" ]; then
+            echo "Error: Could not extract coverage percentage"
+            exit 1
+          fi
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+        working-directory: ./tests
+
+      - id: set_badge_url
+        name: Determine badge color and URL
+        shell: bash 
+        run: |
+          COVERAGE=${{ steps.coverage_percent.outputs.coverage }}
+          echo "Coverage: $COVERAGE"
+          if [ $(echo "$COVERAGE >= 90" | bc -l) -eq 1 ]; then
+            COLOR="brightgreen"
+          elif [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+          BADGE_URL="https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}"
+          echo "badge_url=$BADGE_URL" >> $GITHUB_OUTPUT
