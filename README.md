@@ -22,11 +22,14 @@ This is a project that allows you to use a Security Gate within Github, using Ac
 
 You can define a vulnerability policy based on impact i.e. the number of vulnerabilities per threat, and automatically block your CI/CD pipeline if these policies are not met. This ensures that your application has greater protection, preventing codes that contain known threats from being deployed in production.
 
+You can read more about the project in this blog post: [A simple and practical Security Gate for GitHub Security Alerts](https://blog.lesis.lat/blog/A-simple-and-practical-Security-Gate-for-GitHub-Security-Alerts/).
+
 ---
 
 ### Github Actions
 
 You need to create a token with read access to Security Alerts and configure it within the Secrets resource of your repository, then:
+
 In your repository, create a YAML file at: ```.github/workflows/security-gate.yml``` with this content:
 
 ```yaml
