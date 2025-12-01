@@ -1,6 +1,5 @@
-requires "Getopt::Long", "2.54";
-requires "Mojo::JSON";
-requires "Mojo::UserAgent";
+ifrequires "Getopt::Long", "2.54";
+requires "Mojolicious", "9.39";
 
 on 'test' => sub {
     requires "Test::More";
