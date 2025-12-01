@@ -4,14 +4,15 @@ use 5.030;
 use strict;
 use warnings;
 use lib "./lib/";
+use Getopt::Long;
 use SecurityGate::Engine::Dependencies qw(@SEVERITIES);
 use SecurityGate::Engine::Secrets;
 use SecurityGate::Engine::Code;
 use SecurityGate::Utils::Helper;
-use Getopt::Long;
 
 sub main {
     my ($token, $repository, $dependency_alerts, $secret_alerts, $code_alerts);
+    
     my %severity_limits = map {$_ => 0} @SEVERITIES;
 
     Getopt::Long::GetOptions(
