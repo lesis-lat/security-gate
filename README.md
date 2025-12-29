@@ -6,11 +6,12 @@
       <img src="https://img.shields.io/badge/license-MIT-blue.svg">
     </a>
      <a href="https://github.com/instriq/security-gate/releases">
-      <img src="https://img.shields.io/badge/version-0.1.0-blue.svg">
+      <img src="https://img.shields.io/badge/version-0.1.1-blue.svg">
     </a>
     <img src="https://github.com/instriq/security-gate/actions/workflows/linter.yml/badge.svg">
     <img src="https://github.com/instriq/security-gate/actions/workflows/zarn.yml/badge.svg">
     <img src="https://github.com/instriq/security-gate/actions/workflows/security-gate.yml/badge.svg">
+    <img src="https://img.shields.io/badge/coverage-96.9%25-brightgreen.svg">
   </p>
 </p>
 
@@ -22,11 +23,14 @@ This is a project that allows you to use a Security Gate within Github, using Ac
 
 You can define a vulnerability policy based on impact i.e. the number of vulnerabilities per threat, and automatically block your CI/CD pipeline if these policies are not met. This ensures that your application has greater protection, preventing codes that contain known threats from being deployed in production.
 
+You can read more about the project in this blog post: [A simple and practical Security Gate for GitHub Security Alerts](https://blog.lesis.lat/blog/A-simple-and-practical-Security-Gate-for-GitHub-Security-Alerts/).
+
 ---
 
 ### Github Actions
 
 You need to create a token with read access to Security Alerts and configure it within the Secrets resource of your repository, then:
+
 In your repository, create a YAML file at: ```.github/workflows/security-gate.yml``` with this content:
 
 ```yaml
@@ -79,7 +83,7 @@ jobs:
 $ git clone https://github.com/instriq/security-gate && cd security-gate
     
 # Install libs dependencies
-$ sudo cpanm --installdeps .
+$ cpanm --installdeps .
 
 # Basic usage
 $ perl security-gate.pl --help

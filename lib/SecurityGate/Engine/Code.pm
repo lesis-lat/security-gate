@@ -2,9 +2,11 @@ package SecurityGate::Engine::Code {
     use strict;
     use warnings;
     use Readonly;
-    our $VERSION = '0.1.0';
     use Mojo::UserAgent;
     use Mojo::JSON;
+    
+    our $VERSION = '0.1.0';
+    
     Readonly my $HTTP_OK => 200;
 
     sub new {
