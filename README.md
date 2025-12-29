@@ -11,6 +11,7 @@
     <img src="https://github.com/instriq/security-gate/actions/workflows/linter.yml/badge.svg">
     <img src="https://github.com/instriq/security-gate/actions/workflows/zarn.yml/badge.svg">
     <img src="https://github.com/instriq/security-gate/actions/workflows/security-gate.yml/badge.svg">
+    <img src="https://img.shields.io/badge/coverage-96.9%25-brightgreen.svg">
   </p>
 </p>
 

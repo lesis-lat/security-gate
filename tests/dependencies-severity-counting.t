@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_OK => 200;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -38,7 +42,7 @@ subtest 'Severity counting' => sub {
 
     my $mock_response = Test::MockObject -> new;
     Mojo::UserAgent -> set_mock_response($mock_response);
-    $mock_response -> set_always('code', 200);
+    $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', [
         { state => 'open', security_vulnerability => { severity => 'high' } },
         { state => 'open', security_vulnerability => { severity => 'critical' } },
@@ -55,7 +59,7 @@ subtest 'Severity counting' => sub {
 
     stdout_like(
         sub { SecurityGate::Engine::Dependencies -> new('test_token', 'test_repo', \%severity_limits) },
-        qr/critical:\ 1.*high:\ 1.*medium:\ 1.*low:\ 0/xs,
+        qr/critical:\ 1.*high:\ 1.*medium:\ 1.*low:\ 0/xsm,
         'Severity counts are correct'
     );
 };

@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_UNAUTHORIZED => 401;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -38,7 +42,7 @@ subtest 'API error handling' => sub {
 
     my $mock_response = Test::MockObject -> new;
     Mojo::UserAgent -> set_mock_response($mock_response);
-    $mock_response -> set_always('code', 401);
+    $mock_response -> set_always('code', $HTTP_UNAUTHORIZED);
 
     my %severity_limits = (
         critical => 0,

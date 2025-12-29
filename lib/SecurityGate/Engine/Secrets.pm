@@ -1,8 +1,11 @@
 package SecurityGate::Engine::Secrets {
     use strict;
     use warnings;
+    use Readonly;
+    our $VERSION = '0.1.0';
     use Mojo::UserAgent;
     use Mojo::JSON;
+    Readonly my $HTTP_OK => 200;
 
     sub new {
         my ($class, $token, $repository, $severity_limits) = @_;

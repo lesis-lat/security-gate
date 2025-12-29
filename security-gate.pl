@@ -3,6 +3,7 @@
 use 5.030;
 use strict;
 use warnings;
+our $VERSION = '0.1.0';
 use lib "./lib/";
 use Getopt::Long;
 use SecurityGate::Engine::Dependencies qw(@SEVERITIES);

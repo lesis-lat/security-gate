@@ -2,6 +2,10 @@
 
 use strict;
 use warnings;
+use Readonly;
+our $VERSION = '0.1.0';
+Readonly my $HTTP_OK => 200;
+
 use Test::More;
 use Test::Exception;
 use Test::MockObject;
@@ -38,7 +42,7 @@ subtest 'No open code scanning alerts' => sub {
     plan tests => 2;
 
     my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
-    $mock_response -> set_always('code', 200);
+    $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', []);
 
     my %severity_limits = (
@@ -49,9 +53,10 @@ subtest 'No open code scanning alerts' => sub {
     );
 
     my $result;
+    my $total_pattern = qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 0/xms;
     stdout_like(
         sub { $result = SecurityGate::Engine::Code -> new('test_token', 'test_repo', \%severity_limits) },
-        qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 0/x,
+        $total_pattern,
         'Correct output for no open alerts'
     );
 
