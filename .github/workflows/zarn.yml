@@ -1,12 +1,8 @@
 name: ZARN SAST
 
 on:
-  push:
-    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
-  schedule:
-    - cron: '28 23 * * 1'
 
 jobs:
   zarn:
