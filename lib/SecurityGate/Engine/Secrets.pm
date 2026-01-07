@@ -4,17 +4,16 @@ package SecurityGate::Engine::Secrets {
     use Readonly;
     our $VERSION = '0.1.0';
     use Mojo::UserAgent;
-    use Mojo::JSON;
     Readonly my $HTTP_OK => 200;
 
     sub new {
-        my ($class, $token, $repository, $severity_limits) = @_;
+        my (undef, $token, $repository, $severity_limits) = @_;
 
         my $endpoint  = "https://api.github.com/repos/$repository/secret-scanning/alerts";
-        my $userAgent = Mojo::UserAgent -> new();
-        my $request   = $userAgent -> get($endpoint, {Authorization => "Bearer $token"}) -> result();
+        my $user_agent = Mojo::UserAgent -> new();
+        my $request   = $user_agent -> get($endpoint, {Authorization => "Bearer $token"}) -> result();
 
-        if ($request->code() == 200) {
+        if ($request -> code() == $HTTP_OK) {
             my $data        = $request -> json();
             my $open_alerts = 0;
             my @alert_details;
@@ -23,17 +22,17 @@ package SecurityGate::Engine::Secrets {
                 if ($alert -> {state} eq "open") {
                     $open_alerts++;
 
-                    my $locations_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts/" . $alert->{number} . "/locations";
+                    my $locations_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts/" . $alert -> {number} . "/locations";
                     
-                    my $locations_request  = $userAgent -> get($locations_endpoint, {
+                    my $locations_request  = $user_agent -> get($locations_endpoint, {
                         Authorization => "Bearer $token"
                     }) -> result();
 
-                    if ($locations_request -> code() == 200) {
+                    if ($locations_request -> code() == $HTTP_OK) {
                         my $locations = $locations_request -> json();
 
                         push @alert_details, {
-                            alert_number => $alert->{number},
+                            alert_number => $alert -> {number},
                             locations    => $locations,
                         };
                     }
@@ -41,17 +40,17 @@ package SecurityGate::Engine::Secrets {
             }
 
             foreach my $detail (@alert_details) {
-                print "[-] Alert " . $detail->{alert_number} . " found in the following locations:\n";
+                print "[-] Alert " . $detail -> {alert_number} . " found in the following locations:\n";
 
-                foreach my $location (@{$detail->{locations}}) {
-                    my $file_path  = $location->{details}->{path} // 'Unknown file';
-                    my $start_line = $location->{details}->{start_line} // 'Unknown line';
+                foreach my $location (@{$detail -> {locations}}) {
+                    my $file_path  = $location -> {details} -> {path} // 'Unknown file';
+                    my $start_line = $location -> {details} -> {start_line} // 'Unknown line';
 
                     print "File: $file_path, Start line: $start_line\n";
                 }
             }
 
-            my $threshold = $severity_limits->{high};
+            my $threshold = $severity_limits -> {high};
 
             if ($open_alerts > $threshold) {
                 print "[+] More than $threshold secret scanning alerts found. Blocking pipeline.\n";
@@ -65,7 +64,7 @@ package SecurityGate::Engine::Secrets {
         }
 
         else {
-            print "Error: Unable to fetch secret scanning alerts. HTTP status code: " . $request->code() . "\n";
+            print "Error: Unable to fetch secret scanning alerts. HTTP status code: " . $request -> code() . "\n";
             return 1;
         }
     }

@@ -4,7 +4,6 @@ package SecurityGate::Engine::Dependencies {
     use Readonly;
     our $VERSION = '0.1.0';
     use Mojo::UserAgent;
-    use Mojo::JSON;
     use Exporter 'import';
     Readonly my $HTTP_OK => 200;
 
@@ -12,20 +11,20 @@ package SecurityGate::Engine::Dependencies {
     our @SEVERITIES = ("critical", "high", "medium", "low");
 
     sub new {
-        my ($class, $token, $repository, $severity_limits) = @_;
+        my (undef, $token, $repository, $severity_limits) = @_;
 
         my %severity_counts = map { $_ => 0 } @SEVERITIES;
 
         my $endpoint = "https://api.github.com/repos/$repository/dependabot/alerts";
-        my $userAgent = Mojo::UserAgent->new();
-        my $request = $userAgent->get($endpoint, {Authorization => "Bearer $token"})->result();
+        my $user_agent = Mojo::UserAgent -> new();
+        my $request = $user_agent -> get($endpoint, {Authorization => "Bearer $token"}) -> result();
 
-        if ($request->code() == $HTTP_OK) {
-            my $data = $request->json();
+        if ($request -> code() == $HTTP_OK) {
+            my $data = $request -> json();
 
             foreach my $alert (@{$data}) {
-                if ($alert->{state} eq "open") {
-                    my $severity = $alert->{security_vulnerability}->{severity};
+                if ($alert -> {state} eq "open") {
+                    my $severity = $alert -> {security_vulnerability} -> {severity};
                     $severity_counts{$severity}++;
                 }
             }
@@ -41,8 +40,8 @@ package SecurityGate::Engine::Dependencies {
             my $threshold_exceeded = 0;
 
             foreach my $severity (@SEVERITIES) {
-                if ($severity_counts{$severity} > $severity_limits->{$severity}) {
-                    print "[+] More than $severity_limits->{$severity} $severity security alerts found.\n";
+                if ($severity_counts{$severity} > $severity_limits -> {$severity}) {
+                    print "[+] More than $severity_limits -> {$severity} $severity security alerts found.\n";
                     $threshold_exceeded = 1;
                 }
             }
@@ -51,7 +50,7 @@ package SecurityGate::Engine::Dependencies {
         }
 
         else {
-            print "Error: Unable to fetch alerts. HTTP status code: " . $request->code() . "\n";
+            print "Error: Unable to fetch alerts. HTTP status code: " . $request -> code() . "\n";
             return 1;
         }
     }
