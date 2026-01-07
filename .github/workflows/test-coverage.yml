@@ -25,7 +25,7 @@ jobs:
       coverage_badge_url: ${{ steps.set_badge_url.outputs.badge_url }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install modules
         run: cpanm -n --installdeps .
