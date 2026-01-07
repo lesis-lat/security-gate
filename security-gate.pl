@@ -32,24 +32,23 @@ sub main {
         my $result = 0;
 
         my %alert_checks = (
-            'dependency-alerts' => $dependency_alerts ? sub { SecurityGate::Engine::Dependencies->new($token, $repository, \%severity_limits) } : undef,
-            'secret-alerts'     => $secret_alerts ? sub { SecurityGate::Engine::Secrets->new($token, $repository, \%severity_limits) } : undef,
-            'code-alerts'       => $code_alerts ? sub { SecurityGate::Engine::Code->new($token, $repository, \%severity_limits) } : undef
+            'dependency-alerts' => $dependency_alerts ? sub { SecurityGate::Engine::Dependencies -> new($token, $repository, \%severity_limits) } : undef,
+            'secret-alerts'     => $secret_alerts ? sub { SecurityGate::Engine::Secrets -> new($token, $repository, \%severity_limits) } : undef,
+            'code-alerts'       => $code_alerts ? sub { SecurityGate::Engine::Code -> new($token, $repository, \%severity_limits) } : undef
         );
 
         for my $check (grep { defined } values %alert_checks) {
-            $result += $check->();
+            $result += $check -> ();
         }
 
         return $result;
     }
 
     else {
-        print SecurityGate::Utils::Helper->new();
+        print SecurityGate::Utils::Helper -> new();
         return 1;
     }
 
-    return 0;
 }
 
 if ($ENV{TEST_MODE}) {
