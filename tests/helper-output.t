@@ -9,7 +9,7 @@ use lib '../lib';
 use SecurityGate::Utils::Helper;
 
 subtest 'Helper output' => sub {
-    my $helper_output = SecurityGate::Utils::Helper->new();
+    my $helper_output = SecurityGate::Utils::Helper -> new();
 
     like($helper_output, qr/Security\ Gate\ v0\.1\.0/xms, 'Helper output contains version');
     like($helper_output, qr/-t,\ --token/xms, 'Helper output contains token option');

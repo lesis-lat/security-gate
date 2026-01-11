@@ -43,7 +43,7 @@ subtest 'Open code scanning alerts exceeding limits' => sub {
 
     my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
     $mock_response -> set_always('code', $HTTP_OK);
-    $mock_response->set_always('json', [
+    $mock_response -> set_always('json', [
         { state => 'open', rule => { security_severity_level => 'high' } },
         { state => 'open', rule => { security_severity_level => 'high' } },
         { state => 'open', rule => { security_severity_level => 'medium' } },

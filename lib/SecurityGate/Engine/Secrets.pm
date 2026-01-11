@@ -9,22 +9,22 @@ package SecurityGate::Engine::Secrets {
     sub new {
         my (undef, $token, $repository, $severity_limits) = @_;
 
-        my $endpoint  = "https://api.github.com/repos/$repository/secret-scanning/alerts";
+        my $alerts_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts";
         my $user_agent = Mojo::UserAgent -> new();
-        my $request   = $user_agent -> get($endpoint, {Authorization => "Bearer $token"}) -> result();
+        my $alerts_request = $user_agent -> get($alerts_endpoint, {Authorization => "Bearer $token"}) -> result();
 
-        if ($request -> code() == $HTTP_OK) {
-            my $data        = $request -> json();
+        if ($alerts_request -> code() == $HTTP_OK) {
+            my $alerts_data = $alerts_request -> json();
             my $open_alerts = 0;
             my @alert_details;
 
-            foreach my $alert (@$data) {
+            foreach my $alert (@{$alerts_data}) {
                 if ($alert -> {state} eq "open") {
                     $open_alerts++;
 
                     my $locations_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts/" . $alert -> {number} . "/locations";
-                    
-                    my $locations_request  = $user_agent -> get($locations_endpoint, {
+
+                    my $locations_request = $user_agent -> get($locations_endpoint, {
                         Authorization => "Bearer $token"
                     }) -> result();
 
@@ -39,11 +39,11 @@ package SecurityGate::Engine::Secrets {
                 }
             }
 
-            foreach my $detail (@alert_details) {
-                print "[-] Alert " . $detail -> {alert_number} . " found in the following locations:\n";
+            foreach my $alert_detail (@alert_details) {
+                print "[-] Alert " . $alert_detail -> {alert_number} . " found in the following locations:\n";
 
-                foreach my $location (@{$detail -> {locations}}) {
-                    my $file_path  = $location -> {details} -> {path} // 'Unknown file';
+                foreach my $location (@{$alert_detail -> {locations}}) {
+                    my $file_path = $location -> {details} -> {path} // 'Unknown file';
                     my $start_line = $location -> {details} -> {start_line} // 'Unknown line';
 
                     print "File: $file_path, Start line: $start_line\n";
@@ -64,7 +64,7 @@ package SecurityGate::Engine::Secrets {
         }
 
         else {
-            print "Error: Unable to fetch secret scanning alerts. HTTP status code: " . $request -> code() . "\n";
+            print "Error: Unable to fetch secret scanning alerts. HTTP status code: " . $alerts_request -> code() . "\n";
             return 1;
         }
     }

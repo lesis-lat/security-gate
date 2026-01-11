@@ -15,14 +15,14 @@ package SecurityGate::Engine::Dependencies {
 
         my %severity_counts = map { $_ => 0 } @SEVERITIES;
 
-        my $endpoint = "https://api.github.com/repos/$repository/dependabot/alerts";
+        my $alerts_endpoint = "https://api.github.com/repos/$repository/dependabot/alerts";
         my $user_agent = Mojo::UserAgent -> new();
-        my $request = $user_agent -> get($endpoint, {Authorization => "Bearer $token"}) -> result();
+        my $alerts_request = $user_agent -> get($alerts_endpoint, {Authorization => "Bearer $token"}) -> result();
 
-        if ($request -> code() == $HTTP_OK) {
-            my $data = $request -> json();
+        if ($alerts_request -> code() == $HTTP_OK) {
+            my $alerts_data = $alerts_request -> json();
 
-            foreach my $alert (@{$data}) {
+            foreach my $alert (@{$alerts_data}) {
                 if ($alert -> {state} eq "open") {
                     my $severity = $alert -> {security_vulnerability} -> {severity};
                     $severity_counts{$severity}++;
@@ -50,7 +50,7 @@ package SecurityGate::Engine::Dependencies {
         }
 
         else {
-            print "Error: Unable to fetch alerts. HTTP status code: " . $request -> code() . "\n";
+            print "Error: Unable to fetch alerts. HTTP status code: " . $alerts_request -> code() . "\n";
             return 1;
         }
     }
