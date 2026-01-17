@@ -35,7 +35,7 @@ use Test::Output;
 }
 
 use lib '../lib';
-use SecurityGate::Engine::Dependencies;
+use SecurityGate::Component::DependencyAlerts;
 
 subtest 'Threshold checking' => sub {
     plan tests => 2;
@@ -63,13 +63,13 @@ subtest 'Threshold checking' => sub {
     );
 
     is(
-        SecurityGate::Engine::Dependencies -> new('test_token', 'test_repo', \%severity_limits_exceeded),
+        SecurityGate::Component::DependencyAlerts -> new('test_token', 'test_repo', \%severity_limits_exceeded),
         1,
         'Returns 1 when threshold is exceeded'
     );
 
     is(
-        SecurityGate::Engine::Dependencies -> new('test_token', 'test_repo', \%severity_limits_not_exceeded),
+        SecurityGate::Component::DependencyAlerts -> new('test_token', 'test_repo', \%severity_limits_not_exceeded),
         0,
         'Returns 0 when threshold is not exceeded'
     );

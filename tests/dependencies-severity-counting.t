@@ -35,7 +35,7 @@ use Test::Output;
 }
 
 use lib '../lib';
-use SecurityGate::Engine::Dependencies;
+use SecurityGate::Component::DependencyAlerts;
 
 subtest 'Severity counting' => sub {
     plan tests => 1;
@@ -58,7 +58,7 @@ subtest 'Severity counting' => sub {
     );
 
     stdout_like(
-        sub { SecurityGate::Engine::Dependencies -> new('test_token', 'test_repo', \%severity_limits) },
+        sub { SecurityGate::Component::DependencyAlerts -> new('test_token', 'test_repo', \%severity_limits) },
         qr/critical:\ 1.*high:\ 1.*medium:\ 1.*low:\ 0/xsm,
         'Severity counts are correct'
     );
