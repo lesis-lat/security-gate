@@ -36,7 +36,7 @@ use Capture::Tiny qw(capture_stdout);
 }
 
 use lib '../lib';
-use SecurityGate::Engine::Code;
+use SecurityGate::Component::CodeAlerts;
 
 subtest 'Open code scanning alerts exceeding limits' => sub {
     plan tests => 3;
@@ -58,7 +58,7 @@ subtest 'Open code scanning alerts exceeding limits' => sub {
 
     my ($output, $result);
     $output = capture_stdout {
-        $result = SecurityGate::Engine::Code -> new('test_token', 'test_repo', \%severity_limits);
+        $result = SecurityGate::Component::CodeAlerts -> new('test_token', 'test_repo', \%severity_limits);
     };
 
     like($output, qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 3/xms,

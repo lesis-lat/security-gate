@@ -6,9 +6,8 @@ use warnings;
 our $VERSION = '0.1.0';
 use lib "./lib/";
 use Getopt::Long;
-use SecurityGate::Engine::Dependencies qw(@SEVERITIES);
-use SecurityGate::Engine::Secrets;
-use SecurityGate::Engine::Code;
+use SecurityGate::Component::DependencyAlerts qw(@SEVERITIES);
+use SecurityGate::Network::AlertNetwork;
 use SecurityGate::Utils::Helper;
 
 sub main {
@@ -29,32 +28,24 @@ sub main {
     );
 
     if ($token && $repository) {
-        my $result = 0;
-
-        my %alert_checks = (
-            'dependency-alerts' => $dependency_alerts ? sub { SecurityGate::Engine::Dependencies -> new($token, $repository, \%severity_limits) } : undef,
-            'secret-alerts'     => $secret_alerts ? sub { SecurityGate::Engine::Secrets -> new($token, $repository, \%severity_limits) } : undef,
-            'code-alerts'       => $code_alerts ? sub { SecurityGate::Engine::Code -> new($token, $repository, \%severity_limits) } : undef
+        my %alert_options = (
+            dependency_alerts => $dependency_alerts,
+            secret_alerts     => $secret_alerts,
+            code_alerts       => $code_alerts
         );
 
-        for my $check (grep { defined } values %alert_checks) {
-            $result += $check -> ();
-        }
-
+        my $result = SecurityGate::Network::AlertNetwork -> new($token, $repository, \%severity_limits, \%alert_options);
         return $result;
     }
 
-    else {
-        print SecurityGate::Utils::Helper -> new();
-        return 1;
-    }
-
+    print SecurityGate::Utils::Helper -> new();
+    return 1;
 }
 
 if ($ENV{TEST_MODE}) {
     main();
 }
 
-else {
+if (! $ENV{TEST_MODE}) {
     exit main();
 }

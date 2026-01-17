@@ -35,7 +35,7 @@ use Test::Output;
 }
 
 use lib '../lib';
-use SecurityGate::Engine::Dependencies;
+use SecurityGate::Component::DependencyAlerts;
 
 subtest 'API error handling' => sub {
     plan tests => 1;
@@ -52,7 +52,7 @@ subtest 'API error handling' => sub {
     );
 
     is(
-        SecurityGate::Engine::Dependencies -> new('invalid_token', 'test_repo', \%severity_limits),
+        SecurityGate::Component::DependencyAlerts -> new('invalid_token', 'test_repo', \%severity_limits),
         1,
         'Returns 1 when API request fails'
     );

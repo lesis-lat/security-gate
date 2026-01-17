@@ -36,7 +36,7 @@ use Capture::Tiny qw(capture_stdout);
 }
 
 use lib '../lib';
-use SecurityGate::Engine::Code;
+use SecurityGate::Component::CodeAlerts;
 
 subtest 'API request error' => sub {
     plan tests => 2;
@@ -57,7 +57,7 @@ subtest 'API request error' => sub {
     my $full_error_pattern = qr/$error_message$status_code/xms;
 
     stdout_like(
-        sub { $result = SecurityGate::Engine::Code -> new('test_token', 'test_repo', \%severity_limits) },
+        sub { $result = SecurityGate::Component::CodeAlerts -> new('test_token', 'test_repo', \%severity_limits) },
         $full_error_pattern,
         'Correct error message for API request failure'
     );

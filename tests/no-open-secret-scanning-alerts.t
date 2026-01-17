@@ -14,7 +14,7 @@ use Capture::Tiny qw(capture_stdout);
 
 BEGIN {
     use lib '../lib';
-    use_ok('SecurityGate::Engine::Secrets') || print "Bail out!\n";
+    use_ok('SecurityGate::Component::SecretAlerts') || print "Bail out!\n";
 }
 
 {
@@ -82,7 +82,7 @@ subtest 'No open secret scanning alerts' => sub {
     my $expected_output = qr/$expected_output_part1.*$expected_output_part2/xsm;
 
     stdout_like(
-        sub { $result = SecurityGate::Engine::Secrets -> new('test_token', 'test_repo', \%severity_limits) },
+        sub { $result = SecurityGate::Component::SecretAlerts -> new('test_token', 'test_repo', \%severity_limits) },
         $expected_output,
         'Correct output for no open alerts'
     );

@@ -14,7 +14,7 @@ use Capture::Tiny qw(capture_stdout);
 
 BEGIN {
     use lib '../lib';
-    use_ok('SecurityGate::Engine::Secrets') || print "Bail out!\n";
+    use_ok('SecurityGate::Component::SecretAlerts') || print "Bail out!\n";
 }
 
 {
@@ -79,7 +79,7 @@ subtest 'Open secret scanning alerts exceeding limits' => sub {
 
     my $result;
     my $output = capture_stdout {
-        $result = SecurityGate::Engine::Secrets -> new('test_token', 'test_repo', \%severity_limits);
+        $result = SecurityGate::Component::SecretAlerts -> new('test_token', 'test_repo', \%severity_limits);
     };
 
     like($output, qr{\[!\]\ Total\ of\ open\ secret\ scanning\ alerts:\ 2}xsm, 'Correct total number of alerts');

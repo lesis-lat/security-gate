@@ -14,7 +14,7 @@ use Capture::Tiny qw(capture_stdout);
 
 BEGIN {
     use lib '../lib';
-    use_ok('SecurityGate::Engine::Secrets') || print "Bail out!\n";
+    use_ok('SecurityGate::Component::SecretAlerts') || print "Bail out!\n";
 }
 
 {
@@ -75,7 +75,7 @@ subtest 'API error handling' => sub {
     my $expected_error_output = qr/$expected_error_output_part1.*$expected_error_output_part2/xms;
 
     stdout_like(
-        sub { $result = SecurityGate::Engine::Secrets -> new('invalid_token', 'test_repo', \%severity_limits) },
+        sub { $result = SecurityGate::Component::SecretAlerts -> new('invalid_token', 'test_repo', \%severity_limits) },
         $expected_error_output,
         'Correct error message for API failure'
     );
