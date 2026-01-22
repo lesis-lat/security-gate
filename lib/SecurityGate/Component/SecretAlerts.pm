@@ -45,6 +45,8 @@ package SecurityGate::Component::SecretAlerts {
             }
         }
 
+        print "\n[!] Total of open secret scanning alerts: $open_alerts\n\n";
+
         foreach my $alert_detail (@alert_details) {
             print "[-] Alert " . $alert_detail -> {alert_number} . " found in the following locations:\n";
 
