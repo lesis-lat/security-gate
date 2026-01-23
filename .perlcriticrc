@@ -6,3 +6,7 @@ severity = 2
 
 [TestingAndDebugging::ProhibitNoWarnings]
 allow = once
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say
