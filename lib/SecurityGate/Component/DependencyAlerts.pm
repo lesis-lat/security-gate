@@ -19,10 +19,15 @@ package SecurityGate::Component::DependencyAlerts {
 
         my $alerts_endpoint = "https://api.github.com/repos/$repository/dependabot/alerts";
         my $user_agent = Mojo::UserAgent -> new();
-        my $alerts_request = $user_agent -> get($alerts_endpoint, {Authorization => "Bearer $token"}) -> result();
+        my $alerts_request = $user_agent -> get(
+            $alerts_endpoint,
+            {Authorization => "Bearer $token"}
+        ) -> result();
 
         if ($alerts_request -> code() != $HTTP_OK) {
-            print "Error: Unable to fetch alerts. HTTP status code: " . $alerts_request -> code() . "\n";
+            print "Error: Unable to fetch alerts. HTTP status code: "
+                . $alerts_request -> code()
+                . "\n";
             return 1;
         }
 
@@ -47,7 +52,8 @@ package SecurityGate::Component::DependencyAlerts {
 
         foreach my $severity (@SEVERITIES) {
             if ($severity_counts{$severity} > $severity_limits -> {$severity}) {
-                print "[+] More than $severity_limits -> {$severity} $severity security alerts found.\n";
+                print "[+] More than $severity_limits -> {$severity} "
+                    . "$severity security alerts found.\n";
                 $threshold_exceeded = 1;
             }
         }

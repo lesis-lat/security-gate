@@ -13,10 +13,15 @@ package SecurityGate::Component::SecretAlerts {
 
         my $alerts_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts";
         my $user_agent = Mojo::UserAgent -> new();
-        my $alerts_request = $user_agent -> get($alerts_endpoint, {Authorization => "Bearer $token"}) -> result();
+        my $alerts_request = $user_agent -> get(
+            $alerts_endpoint,
+            {Authorization => "Bearer $token"}
+        ) -> result();
 
         if ($alerts_request -> code() != $HTTP_OK) {
-            print "Error: Unable to fetch secret scanning alerts. HTTP status code: " . $alerts_request -> code() . "\n";
+            print "Error: Unable to fetch secret scanning alerts. HTTP status code: "
+                . $alerts_request -> code()
+                . "\n";
             return 1;
         }
 
@@ -28,11 +33,14 @@ package SecurityGate::Component::SecretAlerts {
             if ($alert -> {state} eq "open") {
                 $open_alerts++;
 
-                my $locations_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts/" . $alert -> {number} . "/locations";
+                my $locations_endpoint = "https://api.github.com/repos/$repository/secret-scanning/alerts/"
+                    . $alert -> {number}
+                    . "/locations";
 
-                my $locations_request = $user_agent -> get($locations_endpoint, {
-                    Authorization => "Bearer $token"
-                }) -> result();
+                my $locations_request = $user_agent -> get(
+                    $locations_endpoint,
+                    {Authorization => "Bearer $token"}
+                ) -> result();
 
                 if ($locations_request -> code() == $HTTP_OK) {
                     my $locations = $locations_request -> json();

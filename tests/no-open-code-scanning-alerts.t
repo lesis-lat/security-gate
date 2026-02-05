@@ -19,7 +19,7 @@ use Capture::Tiny qw(capture_stdout);
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -41,7 +41,9 @@ use SecurityGate::Component::CodeAlerts;
 subtest 'No open code scanning alerts' => sub {
     plan tests => 2;
 
-    my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
+    my $mock_response = Mojo::UserAgent -> set_mock_response(
+        Test::MockObject -> new
+    );
     $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', []);
 
@@ -54,11 +56,13 @@ subtest 'No open code scanning alerts' => sub {
 
     my $result;
     my $total_pattern = qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 0/xms;
-    stdout_like(
-        sub { $result = SecurityGate::Component::CodeAlerts -> new('test_token', 'test_repo', \%severity_limits) },
-        $total_pattern,
-        'Correct output for no open alerts'
-    );
+    stdout_like(sub {
+        $result = SecurityGate::Component::CodeAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, $total_pattern, 'Correct output for no open alerts');
 
     is($result, 0, 'Returns 0 when no open alerts are found');
 };

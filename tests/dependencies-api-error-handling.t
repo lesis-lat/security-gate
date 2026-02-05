@@ -18,7 +18,7 @@ use Test::Output;
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -52,7 +52,11 @@ subtest 'API error handling' => sub {
     );
 
     is(
-        SecurityGate::Component::DependencyAlerts -> new('invalid_token', 'test_repo', \%severity_limits),
+        SecurityGate::Component::DependencyAlerts -> new(
+            'invalid_token',
+            'test_repo',
+            \%severity_limits
+        ),
         1,
         'Returns 1 when API request fails'
     );

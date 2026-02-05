@@ -19,7 +19,7 @@ use Capture::Tiny qw(capture_stdout);
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -41,11 +41,13 @@ use SecurityGate::Component::CodeAlerts;
 subtest 'Open code scanning alerts within limits' => sub {
     plan tests => 2;
 
-    my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
+    my $mock_response = Mojo::UserAgent -> set_mock_response(
+        Test::MockObject -> new
+    );
     $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', [
-        { state => 'open', rule => { severity => 'high' } },
-        { state => 'open', rule => { severity => 'medium' } },
+        {state => 'open', rule => {severity => 'high'}},
+        {state => 'open', rule => {severity => 'medium'}},
     ]);
 
     my %severity_limits = (
@@ -60,11 +62,13 @@ subtest 'Open code scanning alerts within limits' => sub {
     my $severity_pattern = qr/(?:\[-\] \s (?:low|medium|high|critical): \s \d+\s*)+/xms;
     my $full_pattern = qr/$total_pattern.*$severity_pattern/xms;
 
-    stdout_like(
-        sub { $result = SecurityGate::Component::CodeAlerts -> new('test_token', 'test_repo', \%severity_limits) },
-        $full_pattern,
-        'Correct output for open alerts within limits'
-    );
+    stdout_like(sub {
+        $result = SecurityGate::Component::CodeAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, $full_pattern, 'Correct output for open alerts within limits');
 
     is($result, 0, 'Returns 0 when open alerts are within limits');
 };

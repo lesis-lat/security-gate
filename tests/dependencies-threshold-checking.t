@@ -18,7 +18,7 @@ use Test::Output;
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -44,8 +44,8 @@ subtest 'Threshold checking' => sub {
     Mojo::UserAgent -> set_mock_response($mock_response);
     $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', [
-        { state => 'open', security_vulnerability => { severity => 'critical' } },
-        { state => 'open', security_vulnerability => { severity => 'critical' } },
+        {state => 'open', security_vulnerability => {severity => 'critical'}},
+        {state => 'open', security_vulnerability => {severity => 'critical'}},
     ]);
 
     my %severity_limits_exceeded = (
@@ -63,13 +63,21 @@ subtest 'Threshold checking' => sub {
     );
 
     is(
-        SecurityGate::Component::DependencyAlerts -> new('test_token', 'test_repo', \%severity_limits_exceeded),
+        SecurityGate::Component::DependencyAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits_exceeded
+        ),
         1,
         'Returns 1 when threshold is exceeded'
     );
 
     is(
-        SecurityGate::Component::DependencyAlerts -> new('test_token', 'test_repo', \%severity_limits_not_exceeded),
+        SecurityGate::Component::DependencyAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits_not_exceeded
+        ),
         0,
         'Returns 0 when threshold is not exceeded'
     );

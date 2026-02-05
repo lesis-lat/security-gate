@@ -12,8 +12,8 @@ use SecurityGate::Utils::Helper;
 
 sub main {
     my ($token, $repository, $dependency_alerts, $secret_alerts, $code_alerts);
-    
-    my %severity_limits = map {$_ => 0} @SEVERITIES;
+
+    my %severity_limits = map { $_ => 0 } @SEVERITIES;
 
     Getopt::Long::GetOptions(
         "t|token=s"         => \$token,
@@ -34,7 +34,12 @@ sub main {
             code_alerts       => $code_alerts
         );
 
-        my $result = SecurityGate::Network::AlertNetwork -> new($token, $repository, \%severity_limits, \%alert_options);
+        my $result = SecurityGate::Network::AlertNetwork -> new(
+            $token,
+            $repository,
+            \%severity_limits,
+            \%alert_options
+        );
         return $result;
     }
 
@@ -46,6 +51,6 @@ if ($ENV{TEST_MODE}) {
     main();
 }
 
-if (! $ENV{TEST_MODE}) {
+if (!$ENV{TEST_MODE}) {
     exit main();
 }

@@ -25,7 +25,7 @@ BEGIN {
     my $locations_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -61,13 +61,13 @@ subtest 'Open secret scanning alerts exceeding limits' => sub {
     plan tests => 5;
 
     MockMojoUserAgent::setup_mock_response($HTTP_OK, [
-        { state => 'open', number => 1 },
-        { state => 'open', number => 2 },
+        {state => 'open', number => 1},
+        {state => 'open', number => 2},
     ]);
 
     MockMojoUserAgent::setup_locations_response($HTTP_OK, [
-        { path => 'file1.txt', start_line => 10 },
-        { path => 'file2.txt', start_line => 20 },
+        {path => 'file1.txt', start_line => 10},
+        {path => 'file2.txt', start_line => 20},
     ]);
 
     my %severity_limits = (
@@ -79,18 +79,38 @@ subtest 'Open secret scanning alerts exceeding limits' => sub {
 
     my $result;
     my $output = capture_stdout {
-        $result = SecurityGate::Component::SecretAlerts -> new('test_token', 'test_repo', \%severity_limits);
+        $result = SecurityGate::Component::SecretAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
     };
 
-    like($output, qr{\[!\]\ Total\ of\ open\ secret\ scanning\ alerts:\ 2}xsm, 'Correct total number of alerts');
-    like($output, qr{\[-\]\ Alert\ 1\ found\ in\ the\ following\ locations:}xsm, 'Alert 1 details present');
-    like($output, qr{\[-\]\ Alert\ 2\ found\ in\ the\ following\ locations:}xsm, 'Alert 2 details present');
+    like(
+        $output,
+        qr{\[!\]\ Total\ of\ open\ secret\ scanning\ alerts:\ 2}xsm,
+        'Correct total number of alerts'
+    );
+    like(
+        $output,
+        qr{\[-\]\ Alert\ 1\ found\ in\ the\ following\ locations:}xsm,
+        'Alert 1 details present'
+    );
+    like(
+        $output,
+        qr{\[-\]\ Alert\ 2\ found\ in\ the\ following\ locations:}xsm,
+        'Alert 2 details present'
+    );
 
     my $match_plus_sign    = qr/\[\+\]/xsm;
     my $match_more_than    = qr/\ More\ than\ \d+/xsm;
     my $match_alerts_found = qr/\ secret\ scanning\ alerts?\ found\./xsm;
     my $match_blocking     = qr/\ Blocking\ pipeline\./xsm;
-    like($output, qr{$match_plus_sign$match_more_than$match_alerts_found$match_blocking}xsm, 'Blocking message present');
+    like(
+        $output,
+        qr{$match_plus_sign$match_more_than$match_alerts_found$match_blocking}xsm,
+        'Blocking message present'
+    );
     is($result, 1, 'Returns 1 when open alerts exceed limit');
 };
 

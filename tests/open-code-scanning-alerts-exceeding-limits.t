@@ -19,7 +19,7 @@ use Capture::Tiny qw(capture_stdout);
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -41,12 +41,14 @@ use SecurityGate::Component::CodeAlerts;
 subtest 'Open code scanning alerts exceeding limits' => sub {
     plan tests => 3;
 
-    my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
+    my $mock_response = Mojo::UserAgent -> set_mock_response(
+        Test::MockObject -> new
+    );
     $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', [
-        { state => 'open', rule => { security_severity_level => 'high' } },
-        { state => 'open', rule => { security_severity_level => 'high' } },
-        { state => 'open', rule => { security_severity_level => 'medium' } },
+        {state => 'open', rule => {security_severity_level => 'high'}},
+        {state => 'open', rule => {security_severity_level => 'high'}},
+        {state => 'open', rule => {security_severity_level => 'medium'}},
     ]);
 
     my %severity_limits = (
@@ -58,14 +60,24 @@ subtest 'Open code scanning alerts exceeding limits' => sub {
 
     my ($output, $result);
     $output = capture_stdout {
-        $result = SecurityGate::Component::CodeAlerts -> new('test_token', 'test_repo', \%severity_limits);
+        $result = SecurityGate::Component::CodeAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
     };
 
-    like($output, qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 3/xms,
-         'Output contains correct total alerts');
+    like(
+        $output,
+        qr/\[!\] \s Total \s of \s open \s code \s scanning \s alerts: \s 3/xms,
+        'Output contains correct total alerts'
+    );
 
-    like($output, qr/\[\+\] \s More \s than \s \d+ \s \w+ \s code \s scanning \s alerts \s found/xms,
-         'Output contains correct severity alert count');
+    like(
+        $output,
+        qr/\[\+\] \s More \s than \s \d+ \s \w+ \s code \s scanning \s alerts \s found/xms,
+        'Output contains correct severity alert count'
+    );
 
     is($result, 1, 'Returns 1 when open alerts exceed limits');
 };
