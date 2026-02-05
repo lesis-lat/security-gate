@@ -25,7 +25,7 @@ BEGIN {
     my $locations_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -74,11 +74,13 @@ subtest 'API error handling' => sub {
     my $expected_error_output_part2 = qr/\ HTTP\ status\ code:\ $HTTP_UNAUTHORIZED/xms;
     my $expected_error_output = qr/$expected_error_output_part1.*$expected_error_output_part2/xms;
 
-    stdout_like(
-        sub { $result = SecurityGate::Component::SecretAlerts -> new('invalid_token', 'test_repo', \%severity_limits) },
-        $expected_error_output,
-        'Correct error message for API failure'
-    );
+    stdout_like(sub {
+        $result = SecurityGate::Component::SecretAlerts -> new(
+            'invalid_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, $expected_error_output, 'Correct error message for API failure');
 
     is($result, 1, 'Returns 1 when API request fails');
 };

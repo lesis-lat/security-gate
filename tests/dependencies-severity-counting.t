@@ -18,7 +18,7 @@ use Test::Output;
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -44,10 +44,10 @@ subtest 'Severity counting' => sub {
     Mojo::UserAgent -> set_mock_response($mock_response);
     $mock_response -> set_always('code', $HTTP_OK);
     $mock_response -> set_always('json', [
-        { state => 'open', security_vulnerability => { severity => 'high' } },
-        { state => 'open', security_vulnerability => { severity => 'critical' } },
-        { state => 'open', security_vulnerability => { severity => 'medium' } },
-        { state => 'closed', security_vulnerability => { severity => 'low' } },
+        {state => 'open', security_vulnerability => {severity => 'high'}},
+        {state => 'open', security_vulnerability => {severity => 'critical'}},
+        {state => 'open', security_vulnerability => {severity => 'medium'}},
+        {state => 'closed', security_vulnerability => {severity => 'low'}},
     ]);
 
     my %severity_limits = (
@@ -57,11 +57,14 @@ subtest 'Severity counting' => sub {
         low      => 0
     );
 
-    stdout_like(
-        sub { SecurityGate::Component::DependencyAlerts -> new('test_token', 'test_repo', \%severity_limits) },
-        qr/critical:\ 1.*high:\ 1.*medium:\ 1.*low:\ 0/xsm,
-        'Severity counts are correct'
-    );
+    stdout_like(sub {
+        SecurityGate::Component::DependencyAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, qr/critical:\ 1.*high:\ 1.*medium:\ 1.*low:\ 0/xsm,
+        'Severity counts are correct');
 };
 
 done_testing();

@@ -12,15 +12,33 @@ package SecurityGate::Network::AlertNetwork {
         my @checks;
 
         if ($alert_options -> {dependency_alerts}) {
-            push @checks, sub { SecurityGate::Component::DependencyAlerts -> new($token, $repository, $severity_limits) };
+            push @checks, sub {
+                return SecurityGate::Component::DependencyAlerts -> new(
+                    $token,
+                    $repository,
+                    $severity_limits
+                );
+            };
         }
 
         if ($alert_options -> {secret_alerts}) {
-            push @checks, sub { SecurityGate::Component::SecretAlerts -> new($token, $repository, $severity_limits) };
+            push @checks, sub {
+                return SecurityGate::Component::SecretAlerts -> new(
+                    $token,
+                    $repository,
+                    $severity_limits
+                );
+            };
         }
 
         if ($alert_options -> {code_alerts}) {
-            push @checks, sub { SecurityGate::Component::CodeAlerts -> new($token, $repository, $severity_limits) };
+            push @checks, sub {
+                return SecurityGate::Component::CodeAlerts -> new(
+                    $token,
+                    $repository,
+                    $severity_limits
+                );
+            };
         }
 
         my $result = 0;

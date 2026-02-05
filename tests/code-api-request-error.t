@@ -19,7 +19,7 @@ use Capture::Tiny qw(capture_stdout);
     my $mock_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -41,7 +41,9 @@ use SecurityGate::Component::CodeAlerts;
 subtest 'API request error' => sub {
     plan tests => 2;
 
-    my $mock_response = Mojo::UserAgent -> set_mock_response(Test::MockObject -> new);
+    my $mock_response = Mojo::UserAgent -> set_mock_response(
+        Test::MockObject -> new
+    );
     $mock_response -> set_always('code', $HTTP_UNAUTHORIZED);
 
     my %severity_limits = (
@@ -56,11 +58,13 @@ subtest 'API request error' => sub {
     my $status_code = qr/\s HTTP \s status \s code: \s $HTTP_UNAUTHORIZED/xms;
     my $full_error_pattern = qr/$error_message$status_code/xms;
 
-    stdout_like(
-        sub { $result = SecurityGate::Component::CodeAlerts -> new('test_token', 'test_repo', \%severity_limits) },
-        $full_error_pattern,
-        'Correct error message for API request failure'
-    );
+    stdout_like(sub {
+        $result = SecurityGate::Component::CodeAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, $full_error_pattern, 'Correct error message for API request failure');
 
     is($result, 1, 'Returns 1 when API request fails');
 };

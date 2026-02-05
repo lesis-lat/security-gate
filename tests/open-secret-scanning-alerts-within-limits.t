@@ -25,7 +25,7 @@ BEGIN {
     my $locations_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -61,11 +61,11 @@ subtest 'Open secret scanning alerts within limits' => sub {
     plan tests => 2;
 
     MockMojoUserAgent::setup_mock_response($HTTP_OK, [
-        { state => 'open', number => 1 },
+        {state => 'open', number => 1},
     ]);
 
     MockMojoUserAgent::setup_locations_response($HTTP_OK, [
-        { details => { path => 'file.txt', start_line => 10 } },
+        {details => {path => 'file.txt', start_line => 10}},
     ]);
 
     my %severity_limits = (
@@ -86,11 +86,13 @@ subtest 'Open secret scanning alerts within limits' => sub {
 
     my $expected_output = qr/$expected_output_part1.*$expected_output_part2.*$expected_output_part3.*$expected_output_part4/xsm;
 
-    stdout_like(
-        sub { $result = SecurityGate::Component::SecretAlerts -> new('test_token', 'test_repo', \%severity_limits) },
-        $expected_output,
-        'Correct output for open alerts within limit'
-    );
+    stdout_like(sub {
+        $result = SecurityGate::Component::SecretAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, $expected_output, 'Correct output for open alerts within limit');
 
     is($result, 0, 'Returns 0 when open alerts are within limit');
 };

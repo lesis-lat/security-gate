@@ -25,7 +25,7 @@ BEGIN {
     my $locations_response;
 
     sub new {
-        my $class = shift;
+        my ($class) = @_;
         return Test::MockObject -> new -> mock('get', sub {
             my ($self, $url, $headers) = @_;
             return Test::MockObject -> new -> mock('result', sub {
@@ -61,8 +61,8 @@ subtest 'No open secret scanning alerts' => sub {
     plan tests => 2;
 
     MockMojoUserAgent::setup_mock_response($HTTP_OK, [
-        { state => 'closed' },
-        { state => 'closed' },
+        {state => 'closed'},
+        {state => 'closed'},
     ]);
 
     my %severity_limits = (
@@ -81,11 +81,13 @@ subtest 'No open secret scanning alerts' => sub {
 
     my $expected_output = qr/$expected_output_part1.*$expected_output_part2/xsm;
 
-    stdout_like(
-        sub { $result = SecurityGate::Component::SecretAlerts -> new('test_token', 'test_repo', \%severity_limits) },
-        $expected_output,
-        'Correct output for no open alerts'
-    );
+    stdout_like(sub {
+        $result = SecurityGate::Component::SecretAlerts -> new(
+            'test_token',
+            'test_repo',
+            \%severity_limits
+        );
+    }, $expected_output, 'Correct output for no open alerts');
 
     is($result, 0, 'Returns 0 when no open alerts are found');
 };

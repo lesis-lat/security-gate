@@ -13,16 +13,21 @@ package SecurityGate::Component::CodeAlerts {
         my $alerts_endpoint = "https://api.github.com/repos/$repository/code-scanning/alerts";
 
         my $user_agent = Mojo::UserAgent -> new();
-        my $alerts_request = $user_agent -> get($alerts_endpoint, {Authorization => "Bearer $token"}) -> result();
+        my $alerts_request = $user_agent -> get(
+            $alerts_endpoint,
+            {Authorization => "Bearer $token"}
+        ) -> result();
 
         if ($alerts_request -> code() != $HTTP_OK) {
-            print "Error: Unable to fetch code scanning alerts. HTTP status code: " . $alerts_request -> code() . "\n";
+            print "Error: Unable to fetch code scanning alerts. HTTP status code: "
+                . $alerts_request -> code()
+                . "\n";
             return 1;
         }
 
         my $alerts_data = $alerts_request -> json();
         my $open_alerts = 0;
-        my %severity_counts = map {$_ => 0} keys %{$severity_limits};
+        my %severity_counts = map { $_ => 0 } keys %{$severity_limits};
 
         foreach my $alert (@{$alerts_data}) {
             if ($alert -> {state} eq "open") {
@@ -51,7 +56,8 @@ package SecurityGate::Component::CodeAlerts {
 
         foreach my $severity (keys %severity_counts) {
             if ($severity_counts{$severity} > $severity_limits -> {$severity}) {
-                print "[+] More than $severity_limits -> {$severity} $severity code scanning alerts found.\n";
+                print "[+] More than $severity_limits -> {$severity} "
+                    . "$severity code scanning alerts found.\n";
                 $threshold_exceeded = 1;
             }
         }
