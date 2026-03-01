@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run Bunkai scan
-        uses: lesis-lat/bunkai@0.3.0
+        uses: lesis-lat/bunkai@0.2.0
         with:
           project-path: .
           mode: scan
@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run Bunkai update planner
-        uses: lesis-lat/bunkai@0.3.0
+        uses: lesis-lat/bunkai@0.2.0
         with:
           project-path: .
           mode: plan
@@ -68,11 +68,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
-          token: ${{ secrets.BUNKAI_GITHUB_TOKEN }}
 
       - name: Apply single update
-        uses: lesis-lat/bunkai@0.3.0
+        uses: lesis-lat/bunkai@0.2.0
         with:
           project-path: .
           mode: apply
@@ -91,7 +89,7 @@ jobs:
         if: ${{ steps.changes.outputs.changed == 'true' }}
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.BUNKAI_GITHUB_TOKEN }}
+          token: ${{ secrets.BUNKAI_GITHUB_TOKEN || github.token }}
           commit-message: "chore(deps): apply Bunkai fix ${{ matrix.update.id }}"
           title: "chore(deps): Bunkai fix for ${{ matrix.update.module }} (${{ matrix.update.reason }})"
           body: |
