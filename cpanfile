@@ -1,5 +1,5 @@
 requires "Getopt::Long",        "2.58";
-requires "Mojolicious",         "9.41";  
+requires "Mojolicious", "9.42";
 
 on 'test' => sub {
 requires "Test::More",          "1.302214";
