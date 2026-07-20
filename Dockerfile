@@ -1,4 +1,4 @@
-FROM perl:5.42
+FROM perl:5.44
 
 COPY . /usr/src/security-gate
 WORKDIR /usr/src/security-gate
